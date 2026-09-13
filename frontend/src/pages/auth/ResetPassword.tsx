@@ -1,16 +1,17 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '../../components/layout/AuthLayout';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
 import { api, getErrorMessage } from '../../lib/api';
 
-export function ForgotPassword() {
+export function ResetPassword() {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token') || '';
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
-  const [resetCode, setResetCode] = useState<string | null>(null);
+
+  const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -19,9 +20,8 @@ export function ForgotPassword() {
     setError(null);
     setLoading(true);
     try {
-      const res = await api.post('/auth/forgot-password', { email });
-      setSent(true);
-      setResetCode(res.data.resetCode ?? null);
+      await api.post('/auth/reset-password', { token, newPassword });
+      navigate('/login');
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -29,54 +29,37 @@ export function ForgotPassword() {
     }
   }
 
-  function handleContinueWithCode() {
-    if (!resetCode) return;
-    navigate(`/reset-password?token=${resetCode}`);
+  if (!token) {
+    return (
+      <AuthLayout title="Enlace inválido" subtitle="Falta el token de recuperación">
+        <Alert>
+          Este enlace no incluye un token válido. Solicita uno nuevo desde{' '}
+          <Link to="/forgot-password" className="underline">recuperar clave</Link>.
+        </Alert>
+      </AuthLayout>
+    );
   }
 
   return (
-    <AuthLayout title="Recuperar clave" subtitle="Te enviamos un código para crear una nueva">
-      {sent ? (
-        <div className="flex flex-col items-center gap-4 text-center">
-          <Alert variant="success">
-            Si el correo está registrado, te llegó un código de recuperación.
-          </Alert>
-
-          {resetCode && (
-            <div className="w-full rounded-xl border border-border bg-surface p-5">
-              <p className="text-sm text-ink-muted">
-                ¿No te llegó el correo? Continúa ya mismo con este código de respaldo:
-              </p>
-              <p className="mt-3 font-mono text-3xl font-semibold tracking-widest text-signal">
-                {resetCode}
-              </p>
-              <Button variant="primary" className="mt-4 w-full" onClick={handleContinueWithCode}>
-                Continuar con este código
-              </Button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {error && <Alert>{error}</Alert>}
+    <AuthLayout title="Crea una nueva clave" subtitle="Mínimo 8 caracteres">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {error && <Alert>{error}</Alert>}
+        <div>
           <Input
-            label="Correo"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            label="Nueva clave"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
             required
           />
-          <Button type="submit" loading={loading} className="mt-2 w-full">
-            Enviar código
-          </Button>
-        </form>
-      )}
-      <p className="mt-6 text-center text-sm text-ink-muted">
-        <Link to="/login" className="text-signal hover:underline">
-          Volver al login
-        </Link>
-      </p>
+          <p className="mt-1.5 text-xs text-ink-muted">
+            Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo (ej: @, #, !).
+          </p>
+        </div>
+        <Button type="submit" loading={loading} className="mt-2 w-full">Actualizar clave</Button>
+      </form>
     </AuthLayout>
   );
 }
