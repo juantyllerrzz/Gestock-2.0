@@ -37,7 +37,9 @@ export function ProductsTable({ products, canManage, onEdit, onDelete }: Product
                 <td className="px-5 py-3.5 text-ink-muted">{p.category?.name ?? '—'}</td>
                 <td className="px-5 py-3.5 font-mono text-ink-muted">${Number(p.unitPrice).toLocaleString('es-CO')}</td>
                 <td className="px-5 py-3.5 font-mono">
-                  <span className={p.currentStock <= p.minStock ? 'text-warn' : 'text-ink-muted'}>{p.currentStock}</span>
+                  <span className={p.currentStock <= p.minStock ? 'font-semibold text-critical' : 'text-ink-muted'}>
+                    {p.currentStock}
+                  </span>
                 </td>
                 <td className="px-5 py-3.5 font-mono text-ink-muted">{p.minStock}</td>
                 {canManage && (

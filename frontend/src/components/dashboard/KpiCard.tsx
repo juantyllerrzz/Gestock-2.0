@@ -5,12 +5,12 @@ interface KpiCardProps {
   label: string;
   value: ReactNode;
   icon: ReactNode;
-  tone?: 'default' | 'warn';
+  tone?: 'default' | 'critical';
 }
 
 const TONE_STYLES: Record<string, string> = {
   default: 'text-signal bg-signal/10',
-  warn: 'text-warn bg-warn/10',
+  critical: 'text-critical bg-critical/10',
 };
 
 export function KpiCard({ label, value, icon, tone = 'default' }: KpiCardProps) {

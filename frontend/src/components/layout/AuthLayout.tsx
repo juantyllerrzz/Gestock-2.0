@@ -13,7 +13,7 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-surface to-base p-12 lg:flex">
-        <img src={logoFull} alt="Gestock" className="h-16 w-auto self-start" />
+        <img src={logoFull} alt="Gestock" className="h-28 w-auto self-start" />
 
         <div className="relative flex flex-1 items-center justify-center">
           <div className="radar-pulse h-3 w-3 rounded-full bg-signal text-signal shadow-signal" />

@@ -1,13 +1,6 @@
 import { Card } from '../ui/Card';
 import type { ProductAtRisk } from '../../lib/types';
 
-function riskToneClass(days: number | null) {
-  if (days === null) return 'text-ink-muted';
-  if (days <= 3) return 'text-critical';
-  if (days <= 7) return 'text-warn';
-  return 'text-signal';
-}
-
 export function RiskTable({ items }: { items: ProductAtRisk[] }) {
   if (items.length === 0) {
     return (
@@ -34,17 +27,15 @@ export function RiskTable({ items }: { items: ProductAtRisk[] }) {
           </thead>
           <tbody>
             {items.map((item) => {
-              const toneClass = riskToneClass(item.daysUntilStockout);
-              const isCritical = item.daysUntilStockout !== null && item.daysUntilStockout <= 3;
+              const hasForecast = item.daysUntilStockout !== null;
+              const isUrgent = hasForecast && item.daysUntilStockout! <= 3;
               return (
                 <tr key={item.productId} className="border-b border-border/60 last:border-0">
                   <td className="px-5 py-3.5 font-medium text-ink">{item.productName}</td>
                   <td className="px-5 py-3.5 font-mono text-ink-muted">{item.currentStock}</td>
                   <td className="px-5 py-3.5">
-                    <span className={`inline-flex items-center gap-2 font-mono ${toneClass}`}>
-                      {isCritical && (
-                        <span className="radar-pulse h-1.5 w-1.5 rounded-full bg-critical text-critical" />
-                      )}
+                    <span className={`inline-flex items-center gap-2 font-mono ${hasForecast ? 'font-semibold text-critical' : 'text-ink-muted'}`}>
+                      {isUrgent && <span className="radar-pulse h-1.5 w-1.5 rounded-full bg-critical text-critical" />}
                       {item.daysUntilStockout ?? '—'} días
                     </span>
                   </td>

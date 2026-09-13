@@ -8,7 +8,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
-  register: (name: string, email: string, password: string) => Promise<{ message: string }>;
+  register: (name: string, email: string, password: string) => Promise<{ message: string; verificationCode: string }>;
   logout: () => void;
 }
 
@@ -34,11 +34,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return res.data.user as AuthUser;
   }
 
-  // El registro ya NO inicia sesion automaticamente: la cuenta queda
-  // inactiva hasta que el usuario confirme su correo.
   async function register(name: string, email: string, password: string) {
     const res = await api.post('/auth/register', { name, email, password });
-    return res.data as { message: string };
+    return res.data as { message: string; verificationCode: string };
   }
 
   function logout() {

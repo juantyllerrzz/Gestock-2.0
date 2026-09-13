@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailerService } from '../mailer/mailer.service';
@@ -14,6 +13,10 @@ import { RegisterDto } from './dto/register.dto';
 
 const RESET_TOKEN_TTL_MINUTES = 30;
 const VERIFICATION_TOKEN_TTL_HOURS = 24;
+
+function generateCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 @Injectable()
 export class AuthService {
@@ -46,24 +49,28 @@ export class AuthService {
       data: { name: dto.name, email: dto.email, password: hashed, role: Role.EMPLOYEE },
     });
 
-    await this.sendVerificationEmail(user.id, user.email);
+    const code = await this.createVerificationToken(user.id);
+    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+    await this.mailerService.sendVerificationEmail(user.email, `${baseUrl}/verify-email?token=${code}`);
 
-    return { message: 'Cuenta creada. Revisa tu correo para confirmarla antes de iniciar sesion.' };
+    return {
+      message: 'Cuenta creada. Revisa tu correo, o usa el codigo de respaldo para activarla ya mismo.',
+      verificationCode: code,
+    };
   }
 
-  private async sendVerificationEmail(userId: string, email: string) {
-    const token = crypto.randomBytes(32).toString('hex');
+  private async createVerificationToken(userId: string) {
+    const token = generateCode();
     const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_TTL_HOURS * 60 * 60 * 1000);
     await this.prisma.emailVerificationToken.create({ data: { token, userId, expiresAt } });
-    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
-    await this.mailerService.sendVerificationEmail(email, `${baseUrl}/verify-email?token=${token}`);
+    return token;
   }
 
   async verifyEmail(token: string) {
     const verificationToken = await this.prisma.emailVerificationToken.findUnique({ where: { token } });
 
     if (!verificationToken || verificationToken.used || verificationToken.expiresAt < new Date()) {
-      throw new BadRequestException('El enlace de confirmacion es invalido o expiro');
+      throw new BadRequestException('El codigo de confirmacion es invalido o expiro');
     }
 
     await this.prisma.$transaction([
@@ -77,9 +84,12 @@ export class AuthService {
   async resendVerification(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (user && !user.emailVerified) {
-      await this.sendVerificationEmail(user.id, user.email);
+      const code = await this.createVerificationToken(user.id);
+      const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+      await this.mailerService.sendVerificationEmail(user.email, `${baseUrl}/verify-email?token=${code}`);
+      return { message: 'Enviamos un nuevo codigo.', verificationCode: code };
     }
-    return { message: 'Si el correo existe y no ha sido confirmado, se envio un nuevo enlace.' };
+    return { message: 'Si el correo existe y no ha sido confirmado, se envio un nuevo codigo.' };
   }
 
   async getProfile(userId: string) {
@@ -92,10 +102,10 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      return { message: 'Si el correo existe, se envio un enlace de recuperacion' };
+      return { message: 'Si el correo existe, se envio un codigo de recuperacion' };
     }
 
-    const token = crypto.randomBytes(32).toString('hex');
+    const token = generateCode();
     const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MINUTES * 60 * 1000);
 
     await this.prisma.passwordResetToken.create({
@@ -103,17 +113,19 @@ export class AuthService {
     });
 
     const baseUrl = process.env.APP_URL || 'http://localhost:3000';
-    const resetLink = `${baseUrl}/reset-password?token=${token}`;
-    await this.mailerService.sendPasswordResetEmail(user.email, resetLink);
+    await this.mailerService.sendPasswordResetEmail(user.email, `${baseUrl}/reset-password?token=${token}`);
 
-    return { message: 'Si el correo existe, se envio un enlace de recuperacion' };
+    return {
+      message: 'Te enviamos un codigo de recuperacion. Tambien puedes usar el de respaldo aqui mismo.',
+      resetCode: token,
+    };
   }
 
   async resetPassword(token: string, newPassword: string) {
     const resetToken = await this.prisma.passwordResetToken.findUnique({ where: { token } });
 
     if (!resetToken || resetToken.used || resetToken.expiresAt < new Date()) {
-      throw new BadRequestException('El enlace de recuperacion es invalido o expiro');
+      throw new BadRequestException('El codigo de recuperacion es invalido o expiro');
     }
 
     const hashed = await bcrypt.hash(newPassword, 10);
