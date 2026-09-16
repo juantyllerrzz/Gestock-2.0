@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { FileSpreadsheet, FileText, Plus } from 'lucide-react';
 import { DashboardShell } from '../../components/layout/DashboardShell';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
@@ -9,6 +9,7 @@ import { ProductFormModal } from '../../components/products/ProductFormModal';
 import { useProducts, type ProductInput } from '../../hooks/useProducts';
 import { useCategories } from '../../hooks/useCategories';
 import { useAuth } from '../../context/AuthContext';
+import { downloadFile, getErrorMessage } from '../../lib/api';
 import type { Product } from '../../lib/types';
 
 type Tab = 'productos' | 'vista' | 'procedimiento';
@@ -29,6 +30,8 @@ export function ProductsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [exportingFormat, setExportingFormat] = useState<'pdf' | 'excel' | null>(null);
 
   function openCreate() { setEditingProduct(null); setModalOpen(true); }
   function openEdit(product: Product) { setEditingProduct(product); setModalOpen(true); }
@@ -55,6 +58,22 @@ export function ProductsPage() {
     }
   }
 
+  async function handleExport(format: 'pdf' | 'excel') {
+    setExportError(null);
+    setExportingFormat(format);
+    try {
+      if (format === 'pdf') {
+        await downloadFile('/export/products/pdf', 'inventario-gestock.pdf');
+      } else {
+        await downloadFile('/export/products/excel', 'inventario-gestock.xlsx');
+      }
+    } catch (err) {
+      setExportError(getErrorMessage(err));
+    } finally {
+      setExportingFormat(null);
+    }
+  }
+
   return (
     <DashboardShell>
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -64,17 +83,42 @@ export function ProductsPage() {
             Catálogo completo, más los listados por Vista SQL y Procedimiento almacenado.
           </p>
         </div>
-        {canManage && (
-          <Button variant="primary" onClick={openCreate}>
-            <Plus className="h-4 w-4" />
-            Nuevo producto
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="ghost"
+            className="border border-border"
+            loading={exportingFormat === 'pdf'}
+            onClick={() => handleExport('pdf')}
+          >
+            <FileText className="h-4 w-4" />
+            PDF
           </Button>
-        )}
+          <Button
+            variant="ghost"
+            className="border border-border"
+            loading={exportingFormat === 'excel'}
+            onClick={() => handleExport('excel')}
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            Excel
+          </Button>
+          {canManage && (
+            <Button variant="primary" onClick={openCreate}>
+              <Plus className="h-4 w-4" />
+              Nuevo producto
+            </Button>
+          )}
+        </div>
       </div>
 
       {successMessage && (
         <div className="mt-4">
           <Alert variant="success">{successMessage}</Alert>
+        </div>
+      )}
+      {exportError && (
+        <div className="mt-4">
+          <Alert>{exportError}</Alert>
         </div>
       )}
 

@@ -13,7 +13,8 @@ enum Role {
   EMPLOYEE
 }
 
-enum MovementType {
+e
+num MovementType {
   IN
   OUT
 }

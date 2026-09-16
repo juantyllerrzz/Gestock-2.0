@@ -8,6 +8,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { MovementsModule } from './movements/movements.module';
 import { ForecastingModule } from './forecasting/forecasting.module';
+import { ExportModule } from './export/export.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ForecastingModule } from './forecasting/forecasting.module';
     ProductsModule,
     MovementsModule,
     ForecastingModule,
+    ExportModule,
   ],
 })
 export class AppModule {}

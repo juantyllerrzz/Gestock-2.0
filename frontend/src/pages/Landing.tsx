@@ -205,7 +205,7 @@ export function Landing() {
       </main>
 
       <footer className="border-t border-border px-6 py-6 text-center text-xs text-ink-muted sm:px-10">
-        © {new Date().getFullYear()} Gestock — Proyecto académico ADSO, SENA.
+        © {new Date().getFullYear()} Gestock—SENA.
       </footer>
     </div>
   );
