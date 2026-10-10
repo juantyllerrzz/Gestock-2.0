@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from 'lucide-react';
+import { Package, Pencil, Trash2 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import type { Product } from '../../lib/types';
 
@@ -33,7 +33,18 @@ export function ProductsTable({ products, canManage, onEdit, onDelete }: Product
             {products.map((p) => (
               <tr key={p.id} className="border-b border-border/60 last:border-0">
                 <td className="px-5 py-3.5 font-mono text-ink-muted">{p.sku}</td>
-                <td className="px-5 py-3.5 font-medium text-ink">{p.name}</td>
+                <td className="px-5 py-3.5">
+                  <div className="flex items-center gap-3">
+                    {p.imageUrl ? (
+                      <img src={p.imageUrl} alt={p.name} className="h-10 w-10 rounded-lg border border-border object-cover" />
+                    ) : (
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-ink-muted">
+                        <Package className="h-4 w-4" />
+                      </span>
+                    )}
+                    <span className="font-medium text-ink">{p.name}</span>
+                  </div>
+                </td>
                 <td className="px-5 py-3.5 text-ink-muted">{p.category?.name ?? '—'}</td>
                 <td className="px-5 py-3.5 font-mono text-ink-muted">${Number(p.unitPrice).toLocaleString('es-CO')}</td>
                 <td className="px-5 py-3.5 font-mono">

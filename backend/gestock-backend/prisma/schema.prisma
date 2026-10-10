@@ -13,8 +13,7 @@ enum Role {
   EMPLOYEE
 }
 
-e
-num MovementType {
+enum MovementType {
   IN
   OUT
 }
@@ -46,6 +45,7 @@ model Product {
   unitPrice    Decimal    @db.Decimal(10, 2)
   currentStock Int        @default(0)
   minStock     Int        @default(0)
+  imageUrl     String?
   categoryId   String
   category     Category   @relation(fields: [categoryId], references: [id])
   movements    Movement[]

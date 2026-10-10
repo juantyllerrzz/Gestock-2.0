@@ -21,6 +21,8 @@ export function MovementsPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const selectedProduct = products.find((p) => p.id === productId);
+
   useEffect(() => {
     api.get<Product[]>('/products').then((res) => {
       setProducts(res.data);
@@ -62,6 +64,13 @@ export function MovementsPage() {
                 </option>
               ))}
             </Select>
+            {selectedProduct?.imageUrl && (
+              <img
+                src={selectedProduct.imageUrl}
+                alt={selectedProduct.name}
+                className="h-24 w-24 rounded-lg border border-border object-cover"
+              />
+            )}
 
             <div className="grid grid-cols-2 gap-2">
               <button

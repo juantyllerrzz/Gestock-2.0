@@ -9,6 +9,7 @@ export interface ProductInput {
   unitPrice: number;
   minStock: number;
   categoryId: string;
+  imageUrl?: string;
 }
 
 export function useProducts() {

@@ -11,6 +11,7 @@ export interface Product {
   unitPrice: string; // Prisma Decimal viaja como string en el JSON
   currentStock: number;
   minStock: number;
+  imageUrl?: string | null;
   categoryId: string;
   category?: Category;
 }
