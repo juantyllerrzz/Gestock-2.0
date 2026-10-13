@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, BarChart3, ShieldCheck, TrendingUp } from 'lucide-react';
+import { ArrowRight, BarChart3, ShieldCheck, TrendingUp, ChevronDown } from 'lucide-react';
 import logoIcon from '../assets/logo-icon.png';
 
 const FEATURES = [
@@ -30,7 +30,8 @@ const STEPS = [
   { number: '03', title: 'Recibe predicciones', description: 'Gestock calcula solo cuándo y cuánto reabastecer.' },
 ];
 
-const PREVIEW_BARS = [40, 65, 30, 80, 55, 45, 70];
+const PREVIEW_BARS = [54, 70, 47, 84, 65, 58, 72];
+const DAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 export function Landing() {
   return (
@@ -96,7 +97,7 @@ export function Landing() {
           >
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 rounded-lg bg-signal px-5 py-3 text-sm font-medium text-white shadow-signal transition-colors hover:bg-signal-dim"
+              className="inline-flex items-center gap-2 rounded-lg bg-signal px-5 py-3 text-sm font-medium text-white shadow-lg shadow-black/20 transition-colors hover:bg-signal-dim"
             >
               Crear cuenta gratis
               <ArrowRight className="h-4 w-4" />
@@ -114,25 +115,55 @@ export function Landing() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="relative mx-auto mt-16 max-w-3xl rounded-2xl border border-border bg-surface p-6 shadow-xl shadow-black/30 sm:p-8"
+          className="relative mx-auto mt-16 max-w-3xl rounded-2xl border border-border bg-surface/90 p-6 shadow-2xl shadow-black/50 backdrop-blur-xl sm:p-8"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <p className="font-display text-sm font-semibold text-ink">Consumo diario promedio</p>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-critical/10 px-2.5 py-1 text-xs font-medium text-critical">
-              <span className="radar-pulse h-1.5 w-1.5 rounded-full bg-critical text-critical" />
-              3 productos en riesgo
-            </span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 rounded-lg border border-border bg-base/60 px-3 py-1 text-xs font-medium text-ink-muted">
+                Últimos 7 días
+                <ChevronDown className="h-3.5 w-3.5" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-critical/10 px-3 py-1 text-xs font-medium text-critical border border-critical/20">
+                <span className="radar-pulse h-1.5 w-1.5 rounded-full bg-critical text-critical" />
+                3 productos en riesgo
+              </span>
+            </div>
           </div>
-          <div className="mt-6 flex h-32 items-end gap-2.5 sm:gap-3">
-            {PREVIEW_BARS.map((height, i) => (
-              <motion.div
-                key={i}
-                initial={{ height: 0 }}
-                animate={{ height: `${height}%` }}
-                transition={{ duration: 0.6, delay: 0.6 + i * 0.06, ease: 'easeOut' }}
-                className="flex-1 rounded-t-md bg-signal/80"
-              />
-            ))}
+
+          <div className="relative mt-8 h-48 sm:h-52">
+            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none text-[10px] text-ink-muted/40 pr-2">
+              <div className="flex items-center gap-2 border-b border-border/40 pb-1"><span>100</span><div className="w-full border-t border-dashed border-border/20" /></div>
+              <div className="flex items-center gap-2 border-b border-border/40 pb-1"><span>70</span><div className="w-full border-t border-dashed border-border/20" /></div>
+              <div className="flex items-center gap-2 border-b border-border/40 pb-1"><span>50</span><div className="w-full border-t border-dashed border-border/20" /></div>
+              <div className="flex items-center gap-2 pb-1"><span>0</span><div className="w-full border-t border-border/40" /></div>
+            </div>
+
+            <div className="absolute left-[51%] top-6 -translate-x-1/2 z-20 flex flex-col items-center">
+              <div className="rounded-md border border-border bg-surfaceHover px-2.5 py-1 text-xs font-medium text-ink shadow-lg shadow-black/60">
+                84 unidades
+              </div>
+              <div className="h-1.5 w-1.5 rotate-45 border-r border-b border-border bg-surfaceHover -mt-1" />
+            </div>
+
+            <div className="absolute inset-0 pl-7 pr-2 flex items-end gap-3 sm:gap-4 pb-6">
+              {PREVIEW_BARS.map((height, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group">
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: `${height}%` }}
+                    transition={{ duration: 0.6, delay: 0.6 + i * 0.06, ease: 'easeOut' }}
+                    className="w-full rounded-t-xl bg-gradient-to-t from-signal/40 via-signal/80 to-signal relative shadow-[0_0_20px_rgba(30,136,214,0.3)] border-t border-white/40"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="absolute bottom-0 left-7 right-2 flex justify-between text-xs text-ink-muted font-medium pt-2">
+              {DAYS.map((day, i) => (
+                <span key={i} className="flex-1 text-center">{day}</span>
+              ))}
+            </div>
           </div>
         </motion.div>
 
@@ -144,13 +175,17 @@ export function Landing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="rounded-2xl border border-border bg-surface p-6 text-left"
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="group relative rounded-2xl border border-border bg-surface/90 p-6 text-left shadow-xl shadow-black/20 backdrop-blur-xl transition-all hover:border-signal/50 hover:shadow-signal/10"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-signal/10 text-signal">
-                <feature.icon className="h-5 w-5" />
-              </span>
-              <h3 className="mt-4 font-display text-base font-semibold text-ink">{feature.title}</h3>
-              <p className="mt-1.5 text-sm text-ink-muted">{feature.description}</p>
+              <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-signal/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none" />
+              <div className="relative z-10">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-signal/20 to-signal/5 text-signal border border-signal/30 shadow-[0_0_15px_rgba(30,136,214,0.2)]">
+                  <feature.icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-5 font-display text-base font-semibold text-ink">{feature.title}</h3>
+                <p className="mt-2 text-sm text-ink-muted leading-relaxed">{feature.description}</p>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -172,7 +207,7 @@ export function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.5, delay: i * 0.12 }}
-                className="text-center sm:text-left"
+                className="text-center sm:text-left rounded-2xl border border-border/60 bg-surface/40 p-6"
               >
                 <p className="font-mono text-sm font-semibold text-signal">{step.number}</p>
                 <h3 className="mt-2 font-display text-lg font-semibold text-ink">{step.title}</h3>
@@ -186,21 +221,24 @@ export function Landing() {
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mx-auto mt-24 max-w-2xl rounded-2xl border border-border bg-gradient-to-br from-surface to-base p-10 text-center"
+          className="mx-auto mt-24 max-w-2xl rounded-2xl border border-border bg-gradient-to-br from-surface to-base p-10 text-center shadow-2xl relative overflow-hidden"
         >
-          <h2 className="font-display text-2xl font-semibold text-ink">
-            Deja de improvisar tu inventario
-          </h2>
-          <p className="mt-2 text-sm text-ink-muted">
-            Crea tu cuenta y empieza a ver predicciones desde el primer producto que registres.
-          </p>
-          <Link
-            to="/register"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-signal px-5 py-3 text-sm font-medium text-white shadow-signal transition-colors hover:bg-signal-dim"
-          >
-            Crear cuenta gratis
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="absolute inset-0 bg-signal/5 blur-3xl pointer-events-none" />
+          <div className="relative z-10">
+            <h2 className="font-display text-2xl font-semibold text-ink">
+              Deja de improvisar tu inventario
+            </h2>
+            <p className="mt-2 text-sm text-ink-muted">
+              Crea tu cuenta y empieza a ver predicciones desde el primer producto que registres.
+            </p>
+            <Link
+              to="/register"
+              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-signal px-6 py-3 text-sm font-medium text-white shadow-lg shadow-black/20 transition-colors hover:bg-signal-dim"
+            >
+              Crear cuenta gratis
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </motion.div>
       </main>
 

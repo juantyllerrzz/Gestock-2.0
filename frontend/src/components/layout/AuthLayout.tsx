@@ -13,10 +13,31 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-surface to-base p-12 lg:flex">
-        <img src={logoFull} alt="Gestock" className="h-28 w-auto self-start" />
-
+        
         <div className="relative flex flex-1 items-center justify-center">
-          <div className="radar-pulse h-3 w-3 rounded-full bg-signal text-signal shadow-signal" />
+          <motion.img
+            src={logoFull}
+            alt="Gestock"
+            className="h-44 w-auto cursor-grab active:cursor-grabbing"
+            drag
+            dragSnapToOrigin={true}
+            whileDrag={{ scale: 1.15, cursor: "grabbing" }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ 
+              opacity: 1, 
+              y: [0, -15, 0],
+              filter: [
+                "drop-shadow(0px 0px 5px rgba(59,130,246,0.2))",
+                "drop-shadow(0px 0px 30px rgba(59,130,246,0.8))",
+                "drop-shadow(0px 0px 5px rgba(59,130,246,0.2))"
+              ]
+            }}
+            transition={{ 
+              opacity: { duration: 0.8 },
+              y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+              filter: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            }}
+          />
         </div>
 
         <motion.div
