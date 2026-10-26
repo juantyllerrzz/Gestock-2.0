@@ -17,7 +17,7 @@ interface ProductFormModalProps {
   product?: Product | null;
 }
 
-const MAX_IMAGE_BYTES = 1024 * 1024;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 const EMPTY_FORM: ProductInput = {
   sku: '',
@@ -52,8 +52,6 @@ export function ProductFormModal({ open, onClose, onSubmit, categories, product 
     setError(null);
   }, [product, categories, open]);
 
-  // Convierte la foto elegida a texto (data URI) para guardarla en la base
-  // de datos junto con el resto de los datos del producto.
   function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -120,7 +118,7 @@ export function ProductFormModal({ open, onClose, onSubmit, categories, product 
                   Quitar
                 </button>
               )}
-              <span className="text-xs text-ink-muted">JPG o PNG, máximo 1 MB</span>
+              <span className="text-xs text-ink-muted">JPG o PNG</span>
             </div>
           </div>
         </div>

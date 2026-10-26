@@ -19,39 +19,93 @@ enum MovementType {
 }
 
 model User {
-  id                 String                   @id @default(uuid())
-  name               String
-  email              String                   @unique
-  password           String
-  role               Role                     @default(EMPLOYEE)
-  emailVerified      Boolean                  @default(false)
-  movements          Movement[]
-  resetTokens        PasswordResetToken[]
-  verificationTokens EmailVerificationToken[]
-  createdAt          DateTime                 @default(now())
+  id                      String                   @id @default(uuid())
+  name                    String
+  email                   String                   @unique
+  password                String
+  role                    Role                     @default(EMPLOYEE)
+  emailVerified           Boolean                  @default(false)
+  createdAt               DateTime                 @default(now())
+  
+  movements               Movement[]
+  schedules               EmployeeSchedule[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+}
+
+model Supplier {
+  id        String    @id @default(uuid())
+  name      String
+  contact   String?
+  estado    String    @default("ACTIVE")
+  createdAt DateTime  @default(now())
+  
+  products  Product[]
 }
 
 model Category {
   id       String    @id @default(uuid())
   name     String    @unique
+  
+  products Product[]
+}
+
+model Brand {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  
   products Product[]
 }
 
 model Product {
-  id           String     @id @default(uuid())
-  sku          String     @unique
+  id           String         @id @default(uuid())
+  sku          String         @unique
   name         String
   description  String?
-  unitPrice    Decimal    @db.Decimal(10, 2)
-  currentStock Int        @default(0)
-  minStock     Int        @default(0)
-  imageUrl     String?
+  cost         Decimal        @default(0.00) @db.Decimal(10, 2)
+  unitPrice    Decimal        @db.Decimal(10, 2)
+  currentStock Int            @default(0)
+  minStock     Int            @default(0)
+  estado       String         @default("ACTIVE")
   categoryId   String
-  category     Category   @relation(fields: [categoryId], references: [id])
+  supplierId   String?
+  brandId      String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  category     Category       @relation(fields: [categoryId], references: [id])
+  supplier     Supplier?      @relation(fields: [supplierId], references: [id])
+  brand        Brand?         @relation(fields: [brandId], references: [id])
+  images       ProductImage[]
   movements    Movement[]
   forecasts    Forecast[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  productId String
+  url       String
+  
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Schedule {
+  id            String             @id @default(uuid())
+  startDate     DateTime           @db.Date
+  endDate       DateTime           @db.Date
+  arrivalTime   DateTime           @db.Time
+  departureTime DateTime           @db.Time
+  
+  employees     EmployeeSchedule[]
+}
+
+model EmployeeSchedule {
+  id         String   @id @default(uuid())
+  userId     String
+  scheduleId String
+  
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 }
 
 model Movement {
@@ -60,38 +114,42 @@ model Movement {
   quantity  Int
   note      String?
   productId String
-  product   Product      @relation(fields: [productId], references: [id])
   userId    String
-  user      User         @relation(fields: [userId], references: [id])
   createdAt DateTime     @default(now())
+  
+  product   Product      @relation(fields: [productId], references: [id])
+  user      User         @relation(fields: [userId], references: [id])
 }
 
 model Forecast {
   id                  String   @id @default(uuid())
   productId           String
-  product             Product  @relation(fields: [productId], references: [id])
   avgDailyConsumption Float
   daysUntilStockout   Int?
   suggestedReorderQty Int
   generatedAt         DateTime @default(now())
+  
+  product             Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model PasswordResetToken {
   id        String   @id @default(uuid())
   token     String   @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   expiresAt DateTime
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EmailVerificationToken {
   id        String   @id @default(uuid())
   token     String   @unique
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   expiresAt DateTime
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

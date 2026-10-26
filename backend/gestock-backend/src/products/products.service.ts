@@ -7,10 +7,19 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  create(dto: CreateProductDto) {
-    return this.prisma.product.create({ data: dto });
-  }
+ create(dto: CreateProductDto) {
 
+    const { imageUrl, ...productData } = dto as any; 
+
+    return this.prisma.product.create({
+      data: {
+        ...productData,
+        images: imageUrl && imageUrl !== "" ? {
+          create: { url: imageUrl }
+        } : undefined
+      }
+    });
+  }
   update(id: string, dto: UpdateProductDto) {
     return this.prisma.product.update({ where: { id }, data: dto });
   }
