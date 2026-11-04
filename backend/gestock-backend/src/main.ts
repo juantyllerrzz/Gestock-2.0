@@ -11,8 +11,13 @@ async function bootstrap() {
   app.use(json({ limit: '5mb' }));
 
   app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+    new ValidationPipe({ 
+      whitelist: true, 
+      forbidNonWhitelisted: true, 
+      transform: true 
+    }),
   );
+  
   app.enableCors();
 
   const port = process.env.PORT || 3000;

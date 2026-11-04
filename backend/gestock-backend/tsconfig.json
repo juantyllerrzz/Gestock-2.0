@@ -10,8 +10,6 @@
     "sourceMap": true,
     "outDir": "./dist",
     "esModuleInterop": true,
-    
-    
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -19,6 +17,6 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
-    
+    "types": ["jest", "node"]
   }
 }
