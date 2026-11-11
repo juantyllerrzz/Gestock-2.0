@@ -1,73 +1,84 @@
 import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Limpiando base de datos...');
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.brand.deleteMany();
-  await prisma.supplier.deleteMany();
+  console.log(' Limpiando datos antiguos...');
 
-  console.log('Insertando Categorías...');
-  const cat1 = await prisma.category.create({ data: { name: 'Electrónica ' } });
-  const cat2 = await prisma.category.create({ data: { name: 'Alimentoss' } });
+  // 1. Limpiar registros respetando llaves foráneas
+  await prisma.movement.deleteMany({});
+  await prisma.product.deleteMany({});
+  await prisma.category.deleteMany({});
 
-  console.log('Insertando Marcas...');
-  const brand1 = await prisma.brand.create({ data: { name: 'Dell' } });
-  const brand2 = await prisma.brand.create({ data: { name: 'Logitech' } });
-  const brand3 = await prisma.brand.create({ data: { name: 'Apple' } });
+  console.log(' Base de datos limpia. Insertando registros...');
 
-  console.log('Insertando Proveedores...');
-  const sup1 = await prisma.supplier.create({ data: { name: 'Distribuidora Tecnológica S.A.', contact: 'contacto@distribuidoratec.com' } });
+  // 2. Crear Categorías (sin el campo description)
+  const catElectronica = await prisma.category.create({
+    data: {
+      name: 'Electrónica y Cómputo',
+    },
+  });
 
-  console.log('Insertando Productos...');
+  const catAlimentos = await prisma.category.create({
+    data: {
+      name: 'Alimentos y Bebidas',
+    },
+  });
+
+  const catOficina = await prisma.category.create({
+    data: {
+      name: 'Suministros de Oficina',
+    },
+  });
+
+  // 3. Crear Productos
   await prisma.product.createMany({
     data: [
       {
         sku: 'ELEC-001',
-        name: 'Laptop Pro 15 Apple',
-        description: 'Laptop de alta gama con 16GB RAM',
-        cost: 800.00,
-        unitPrice: 1200.00,
+        name: 'Laptop Pro 15',
+        description: 'Laptop de alto rendimiento 16GB RAM 512GB SSD',
+        unitPrice: 1200.0,
         currentStock: 15,
         minStock: 3,
-        categoryId: cat1.id,
-        brandId: brand3.id,
-        supplierId: sup1.id,
+        categoryId: catElectronica.id,
       },
       {
-        sku: 'ACC-002',
-        name: 'Monitor 24 Pulgadas Dell',
-        description: 'Monitor LED Full HD para oficina',
-        cost: 380000.00,
-        unitPrice: 520000.00,
-        currentStock: 10,
-        minStock: 3,
-        categoryId: cat1.id,
-        brandId: brand1.id,
-        supplierId: sup1.id,
-      },
-      {
-        sku: 'PER-001',
-        name: 'Mouse Inalámbrico Logitech',
-        description: 'Mouse óptico inalámbrico con receptor USB',
-        cost: 35000.00,
-        unitPrice: 55000.00,
-        currentStock: 40,
+        sku: 'ELEC-002',
+        name: 'Mouse Inalámbrico RGB',
+        description: 'Mouse ergonómico óptico 2.4GHz',
+        unitPrice: 25.5,
+        currentStock: 50,
         minStock: 10,
-        categoryId: cat2.id,
-        brandId: brand2.id,
-        supplierId: sup1.id,
-      }
-    ]
+        categoryId: catElectronica.id,
+      },
+      {
+        sku: 'ALIM-001',
+        name: 'Café Grano Gourmet 1kg',
+        description: 'Café tostado origen colombiano',
+        unitPrice: 18.0,
+        currentStock: 40,
+        minStock: 8,
+        categoryId: catAlimentos.id,
+      },
+      {
+        sku: 'OFI-001',
+        name: 'Resma Papel Carta 500H',
+        description: 'Papel multipropósito 75g/m²',
+        unitPrice: 5.5,
+        currentStock: 100,
+        minStock: 20,
+        categoryId: catOficina.id,
+      },
+    ],
   });
 
-  console.log('¡Base de datos poblada exitosamente!');
+  console.log(' Seed ejecutado con éxito en Gestock 2.0.');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Error ejecutando el seed:', e);
     process.exit(1);
   })
   .finally(async () => {
