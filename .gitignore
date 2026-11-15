@@ -1,0 +1,24 @@
+
+# Variables de entorno y credenciales
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencias
+**/node_modules/
+
+# Archivos compilados
+**/dist/
+**/build/
+**/coverage/
+
+# Entorno virtual de Semgrep
+.semgrep-venv/
+
+# Archivos temporales
+**/*.log
+**/.cache/
+
+# Reportes locales
+semgrep-report.json
+semgrep-report.sarif

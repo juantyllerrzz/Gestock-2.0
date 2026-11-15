@@ -1,0 +1,52 @@
+
+name: Gestock 2.0 - Analisis de Seguridad
+
+# Eventos que activan el análisis
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# Permisos mínimos
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: Escaneo de seguridad
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Obtener el código de Gestock
+      - name: Descargar repositorio
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      # 2. Configurar Python compatible
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      # 3. Instalar Semgrep
+      - name: Instalar Semgrep
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install semgrep
+
+      # 4. Mostrar versión instalada
+      - name: Verificar Semgrep
+        run: semgrep --version
+
+      # 5. Analizar backend y frontend
+      - name: Analizar seguridad de Gestock
+        run: |
+          semgrep scan \
+            --config auto \
+            --error \
+            --metrics=off \
+            --exclude .semgrep-venv \
+            --exclude node_modules \
+            --exclude dist \
+            .
