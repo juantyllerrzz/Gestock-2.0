@@ -6,17 +6,26 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Las fotos viajan como texto dentro del JSON, asi que subimos el limite
-  // por defecto de Express (100 KB) a 5 MB.
+  
   app.use(json({ limit: '5mb' }));
 
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
   );
-  app.enableCors();
+ 
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
-  const port = process.env.PORT || 3000;
+  const port = Number(process.env.PORT) || 3000;
+
   await app.listen(port);
-  console.log(`Gestock backend corriendo en http://localhost:${port}`);
+
+  console.log(
+    `Gestock backend corriendo en http://localhost:${port}`,
+  );
 }
+
 bootstrap();
