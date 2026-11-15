@@ -39,14 +39,16 @@ jobs:
       - name: Verificar Semgrep
         run: semgrep --version
 
+     
       # 5. Analizar backend y frontend
       - name: Analizar seguridad de Gestock
         run: |
           semgrep scan \
-            --config auto \
+            --config p/default \
             --error \
             --metrics=off \
             --exclude .semgrep-venv \
             --exclude node_modules \
             --exclude dist \
             .
+
