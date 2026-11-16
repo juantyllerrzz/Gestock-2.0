@@ -3,6 +3,7 @@ import { LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import logoIcon from '../../assets/logo-icon.png';
+import { GestiChat } from '../gesti-ai/GestiChat';
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'Administrador',
@@ -54,6 +55,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       </header>
 
       <main className="px-6 py-8 sm:px-10">{children}</main>
+
+        <GestiChat />
     </div>
   );
+
 }

@@ -1,5 +1,7 @@
+
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
 import { PrismaModule } from './prisma/prisma.module';
 import { MailerModule } from './mailer/mailer.module';
 import { AuthModule } from './auth/auth.module';
@@ -10,9 +12,15 @@ import { MovementsModule } from './movements/movements.module';
 import { ForecastingModule } from './forecasting/forecasting.module';
 import { ExportModule } from './export/export.module';
 
+
+import { GestiAiModule } from './gesti-ai/gesti-ai.module';
+
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
     PrismaModule,
     MailerModule,
     AuthModule,
@@ -22,6 +30,9 @@ import { ExportModule } from './export/export.module';
     MovementsModule,
     ForecastingModule,
     ExportModule,
+
+  
+    GestiAiModule,
   ],
 })
 export class AppModule {}
